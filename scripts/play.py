@@ -1,4 +1,4 @@
-# Really simple program to play connect for against yourself.
+# Really simple program to play connect4 against yourself.
 from connect4 import State, Player, InvalidMove
 
 
@@ -25,6 +25,7 @@ def play():
             continue
 
         if result is not None:
+            state.display()
             print(f"{result.name} wins!")
             break
 

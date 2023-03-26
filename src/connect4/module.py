@@ -88,9 +88,7 @@ class State:
                 stack[i] = player
                 break
 
-        winner = self._check()
-        if winner is not None:
-            return winner
+        return self._check()
 
     def display(self):
         print("0 1 2 3 4 5 6")
