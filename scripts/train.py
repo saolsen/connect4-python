@@ -1,31 +1,24 @@
-import connect4
+from connect4 import State, Player
 
-# Connect 4 is played on a board like this.
-# O O O O O O O
-# O O O O O O O
-# O O O O O O O
-# O O O O O O O
-# O O O O O O O
-# O O O O O O O
+board = State()
 
-# When it's your turn you can put your color (Red or Blue) in one of the columns.
-# A simple data structure for the board would be an array of 7 stacks of 6 items.
-board: connect4.Board = (
-    [None, None, None, None, None, None],
-    [None, None, None, None, None, None],
-    [None, None, None, None, None, None],
-    [None, None, None, None, None, None],
-    [None, None, None, None, None, None],
-    [None, None, None, None, None, None],
-    [None, None, None, None, None, None],
-)
-
-
-connect4.turn(board, "Blue", 2)
-connect4.turn(board, "Red", 3)
-connect4.turn(board, "Blue", 1)
-connect4.turn(board, "Red", 2)
-
-
-connect4.board_display(board)
-print(connect4.board_check(board))
+print(board.turn(Player.Blue, 2))
+board.display()
+print(board.turn(Player.Red, 3))
+board.display()
+print(board.turn(Player.Blue, 1))
+board.display()
+print(board.turn(Player.Red, 2))
+board.display()
+print(board.turn(Player.Blue, 0))
+board.display()
+print(board.turn(Player.Red, 0))
+board.display()
+print(board.turn(Player.Blue, 1))
+board.display()
+print(board.turn(Player.Red, 1))
+board.display()
+print(board.turn(Player.Blue, 0))
+board.display()
+print(board.turn(Player.Red, 0))
+board.display()

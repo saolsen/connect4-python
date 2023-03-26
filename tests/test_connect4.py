@@ -1,39 +1,26 @@
-import connect4
-
-
-def test_it():
-    connect4.foo()
-    assert True
+from connect4 import State, Player
 
 
 def test_board_check():
-    board: connect4.Board = (
-        [None, None, None, None, None, None],
-        [None, None, None, None, None, None],
-        [None, None, None, None, None, None],
-        [None, None, "Red", None, None, None],
-        [None, None, "Red", None, None, None],
-        [None, None, "Blue", None, None, None],
-        [None, None, "Red", None, None, None],
-    )
-    assert connect4.board_check(board) is None
-    board: connect4.Board = (
-        [None, None, None, None, None, None],
-        [None, None, None, None, None, None],
-        [None, None, None, None, None, None],
-        [None, None, "Red", None, None, None],
-        [None, None, "Red", None, None, None],
-        [None, None, "Red", None, None, None],
-        [None, None, "Red", None, None, None],
-    )
-    assert connect4.board_check(board) == "Red"
-    board: connect4.Board = (
-        [None, None, None, None, None, None],
-        [None, None, None, None, None, None],
-        [None, None, None, None, None, None],
-        [None, None, "Blue", "Blue", "Blue", "Blue"],
-        [None, None, "Red", None, None, None],
-        [None, None, "Red", None, None, None],
-        [None, None, "Red", None, None, None],
-    )
-    assert connect4.board_check(board) == "Blue"
+    board = State()
+    board.turn(Player.Blue, 2)
+    board.display()
+    board.turn(Player.Red, 3)
+    board.display()
+    board.turn(Player.Blue, 1)
+    board.display()
+    board.turn(Player.Red, 2)
+    board.display()
+    board.turn(Player.Blue, 0)
+    board.display()
+    board.turn(Player.Red, 0)
+    board.display()
+    board.turn(Player.Blue, 1)
+    board.display()
+    board.turn(Player.Red, 1)
+    board.display()
+    board.turn(Player.Blue, 0)
+    board.display()
+    result = board.turn(Player.Red, 0)
+
+    assert result == Player.Red
