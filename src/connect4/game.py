@@ -1,3 +1,4 @@
+from typing import Callable
 from enum import Enum
 
 Player = Enum("Player", ["Red", "Blue"])
@@ -7,9 +8,28 @@ Board = tuple[
     list[Slot], list[Slot], list[Slot], list[Slot], list[Slot], list[Slot], list[Slot]
 ]
 
+Agent = Callable[[Board, Player], int]
+
 
 class InvalidMove(Exception):
     pass
+
+
+def display(board: Board):
+    print("0 1 2 3 4 5 6")
+    for row in reversed(range(0, 6)):
+        r = []
+        for col in range(0, 7):
+            s: Slot = board[col][row]
+            if s is None:
+                r.append(".")
+            elif s == Player.Blue:
+                r.append("B")
+            elif s == Player.Red:
+                r.append("R")
+            else:
+                assert False
+        print(" ".join(r))
 
 
 class State:
@@ -23,6 +43,8 @@ class State:
             [None, None, None, None, None, None],
             [None, None, None, None, None, None],
         )
+        self.player = Player.Blue
+        self.turns_left = 6 * 7
 
     def _check(self):
         """
@@ -78,6 +100,8 @@ class State:
         return None
 
     def turn(self, player: Player, column: int):
+        if player != self.player:
+            raise InvalidMove(f"It is {self.player.name}'s turn")
         if column < 0 or column > 6:
             raise InvalidMove(f"No column {column}")
         stack = self.board[column]
@@ -88,20 +112,32 @@ class State:
                 stack[i] = player
                 break
 
+        if self.player == player.Blue:
+            self.player = player.Red
+        else:
+            self.player = player.Blue
+        self.turns_left -= 1
+
         return self._check()
 
-    def display(self):
-        print("0 1 2 3 4 5 6")
-        for row in reversed(range(0, 6)):
-            r = []
-            for col in range(0, 7):
-                s: Slot = self.board[col][row]
-                if s is None:
-                    r.append(".")
-                elif s == Player.Blue:
-                    r.append("B")
-                elif s == Player.Red:
-                    r.append("R")
-                else:
-                    assert False
-            print(" ".join(r))
+    def play(self, blue: Agent, red: Agent):
+        while True:
+            if self.player == Player.Blue:
+                agent = blue
+            else:
+                agent = red
+
+            while True:
+                try:
+                    move = agent(self.board, self.player)
+                    result = self.turn(self.player, move)
+                except InvalidMove:
+                    # TODO: probably don't wanna print here.
+                    print("Invalid Move")
+                    continue
+                break
+
+            if result is not None:
+                return result
+            if self.turns_left == 0:
+                return None

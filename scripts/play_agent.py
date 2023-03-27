@@ -1,53 +1,27 @@
 import random
-
-from connect4 import State, Player, InvalidMove
-
-
-# Dumbest agent possible, has no idea what is going on, just picks
-# a random column
-def rand_agent() -> int:
-    return random.randrange(0, 7)
-
-
-def next_player(player: Player):
-    if player == player.Blue:
-        return player.Red
-    return player.Blue
+from connect4 import State, Board, Player, display
 
 
 def play():
     state = State()
-    player = Player.Blue
-
     print("Connect4")
-    print("Blue Goes First (that's you)")
+    print("Blue Goes First")
     print("Enter the column to drop a chip into")
-    while True:
-        state.display()
 
-        if player == Player.Blue:
-            move = int(input(f"{player.name}'s move: "))
-            try:
-                result = state.turn(player, move)
-            except InvalidMove as e:
-                print("Invalid Move:", e)
-                continue
-        else:
-            while True:
-                move = rand_agent()
-                try:
-                    result = state.turn(player, move)
-                except InvalidMove:
-                    # Just try again, chances are next rand move is fine.
-                    continue
-                break
+    def player_agent(board: Board, player: Player) -> int:
+        display(board)
+        move = int(input(f"{player.name}'s move: "))
+        return move
 
-        if result is not None:
-            state.display()
-            print(f"{result.name} wins!")
-            break
+    def random_agent(board, player) -> int:
+        return random.randrange(0, 7)
 
-        player = next_player(player)
+    result = state.play(player_agent, random_agent)
+    display(state.board)
+    if result is None:
+        print("DRAW!")
+    else:
+        print(f"{result.name} WINS!")
 
 
 if __name__ == "__main__":

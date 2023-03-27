@@ -1,35 +1,24 @@
 # Really simple program to play connect4 against yourself.
-from connect4 import State, Player, InvalidMove
-
-
-def next_player(player: Player):
-    if player == player.Blue:
-        return player.Red
-    return player.Blue
+from connect4 import State, Board, Player, display
 
 
 def play():
     state = State()
-    player = Player.Blue
-
     print("Connect4")
     print("Blue Goes First")
     print("Enter the column to drop a chip into")
-    while True:
-        state.display()
+
+    def agent(board: Board, player: Player) -> int:
+        display(board)
         move = int(input(f"{player.name}'s move: "))
-        try:
-            result = state.turn(player, move)
-        except InvalidMove as e:
-            print("Invalid Move:", e)
-            continue
+        return move
 
-        if result is not None:
-            state.display()
-            print(f"{result.name} wins!")
-            break
-
-        player = next_player(player)
+    result = state.play(agent, agent)
+    display(state.board)
+    if result is None:
+        print("DRAW!")
+    else:
+        print(f"{result.name} WINS!")
 
 
 if __name__ == "__main__":
