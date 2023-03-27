@@ -1,0 +1,38 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "cli v cli",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/play.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "cli v rand",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/play.py",
+            "args": [
+                "rand_agent"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "cli v mcts",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/scripts/play.py",
+            "args": [
+                "mcts_agent"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

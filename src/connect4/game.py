@@ -1,9 +1,10 @@
-from typing import Callable
+from typing import Callable, Optional
 from enum import Enum
 
 Player = Enum("Player", ["Red", "Blue"])
-Slot = Player | None
+Slot = Optional[Player]
 
+# TODO: probably make this a numpy array
 Board = tuple[
     list[Slot], list[Slot], list[Slot], list[Slot], list[Slot], list[Slot], list[Slot]
 ]
@@ -33,18 +34,23 @@ def display(board: Board):
 
 
 class State:
-    def __init__(self):
-        self.board: Board = (
-            [None, None, None, None, None, None],
-            [None, None, None, None, None, None],
-            [None, None, None, None, None, None],
-            [None, None, None, None, None, None],
-            [None, None, None, None, None, None],
-            [None, None, None, None, None, None],
-            [None, None, None, None, None, None],
-        )
-        self.player = Player.Blue
-        self.turns_left = 6 * 7
+    def __init__(self, board=None, player=None):
+        if board is not None:
+            self.board = board
+        else:
+            self.board: Board = (
+                [None, None, None, None, None, None],
+                [None, None, None, None, None, None],
+                [None, None, None, None, None, None],
+                [None, None, None, None, None, None],
+                [None, None, None, None, None, None],
+                [None, None, None, None, None, None],
+                [None, None, None, None, None, None],
+            )
+        if player is not None:
+            self.player = player
+        else:
+            self.player = Player.Blue
 
     def _check(self):
         """
@@ -61,7 +67,7 @@ class State:
                     == self.board[col + 2][row]
                     == self.board[col + 3][row]
                 ):
-                    return self.board[col][row]
+                    return ("WIN", self.board[col][row])
         # Check cols
         for col in range(0, 7):
             for row in range(0, 3):
@@ -72,7 +78,7 @@ class State:
                     == self.board[col][row + 2]
                     == self.board[col][row + 3]
                 ):
-                    return self.board[col][row]
+                    return ("WIN", self.board[col][row])
         # Check diag up
         for col in range(0, 4):
             for row in range(0, 3):
@@ -83,7 +89,7 @@ class State:
                     == self.board[col + 2][row + 2]
                     == self.board[col + 3][row + 3]
                 ):
-                    return self.board[col][row]
+                    return ("WIN", self.board[col][row])
 
         # Check diag down
         for col in range(0, 4):
@@ -95,9 +101,15 @@ class State:
                     == self.board[col + 2][row - 2]
                     == self.board[col + 3][row - 3]
                 ):
-                    return self.board[col][row]
+                    return ("WIN", self.board[col][row])
 
-        return None
+        # Check draw
+        for col in range(0, 7):
+            if self.board[col][5] is None:
+                # There are still moves left
+                return None
+
+        return ("DRAW", None)
 
     def turn(self, player: Player, column: int):
         if player != self.player:
@@ -116,7 +128,6 @@ class State:
             self.player = player.Red
         else:
             self.player = player.Blue
-        self.turns_left -= 1
 
         return self._check()
 
@@ -133,11 +144,9 @@ class State:
                     result = self.turn(self.player, move)
                 except InvalidMove:
                     # TODO: probably don't wanna print here.
-                    print("Invalid Move")
+                    # print("Invalid Move")
                     continue
                 break
 
             if result is not None:
                 return result
-            if self.turns_left == 0:
-                return None
