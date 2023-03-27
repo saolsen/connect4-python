@@ -16,6 +16,11 @@ class InvalidMove(Exception):
     pass
 
 
+BLUE = "\033[94m"
+RED = "\033[91m"
+END = "\033[0m"
+
+
 def display(board: Board):
     print("0 1 2 3 4 5 6")
     for row in reversed(range(0, 6)):
@@ -25,9 +30,9 @@ def display(board: Board):
             if s is None:
                 r.append(".")
             elif s == Player.Blue:
-                r.append("B")
+                r.append(f"{BLUE}B{END}")
             elif s == Player.Red:
-                r.append("R")
+                r.append(f"{RED}R{END}")
             else:
                 assert False
         print(" ".join(r))
