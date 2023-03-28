@@ -22,7 +22,7 @@ def mcts_agent(board: Board, player: Player, actions: list[int]) -> int:
         losses = 0
         draws = 0
 
-        for i in range(0, 50):
+        for i in range(0, 100):
             state = State(
                 board=deepcopy(board),
                 player=deepcopy(player),
