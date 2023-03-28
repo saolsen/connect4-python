@@ -95,25 +95,8 @@ def display(board):
 
 class State:
     def __init__(self, board=None, player=None):
-        if board is not None:
-            self.board = board
-        else:
-            self.board = np.array(
-                [
-                    [0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0],
-                    [0, 0, 0, 0, 0, 0],
-                ],
-                dtype="i4",
-            )
-        if player is not None:
-            self.player = player
-        else:
-            self.player = Player.Blue
+        self.board = np.zeros((7, 6), dtype="i") if board is None else board
+        self.player = Player.Blue if player is None else player
 
     def _check(self):
         """
