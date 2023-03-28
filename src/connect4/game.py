@@ -9,7 +9,7 @@ Board = tuple[
     list[Slot], list[Slot], list[Slot], list[Slot], list[Slot], list[Slot], list[Slot]
 ]
 
-Agent = Callable[[Board, Player], int]
+Agent = Callable[[Board, Player, list[int]], int]
 
 
 class InvalidMove(Exception):
@@ -116,42 +116,36 @@ class State:
 
         return ("DRAW", None)
 
-    def turn(self, player: Player, column: int):
-        if player != self.player:
-            raise InvalidMove(f"It is {self.player.name}'s turn")
-        if column < 0 or column > 6:
-            raise InvalidMove(f"No column {column}")
+    def actions(self):
+        actions = []
+        for col in range(0, 7):
+            if self.board[col][5] is None:
+                actions.append(col)
+        return actions
+
+    def turn(self, column: int):
         stack = self.board[column]
-        if stack[5] is not None:
-            raise InvalidMove(f"Column {column} is Full")
+
         for i, slot in enumerate(stack):
             if slot is None:
-                stack[i] = player
+                stack[i] = self.player
                 break
 
-        if self.player == player.Blue:
-            self.player = player.Red
+        if self.player == Player.Blue:
+            self.player = Player.Red
         else:
-            self.player = player.Blue
+            self.player = Player.Blue
 
         return self._check()
 
     def play(self, blue: Agent, red: Agent):
-        while True:
-            if self.player == Player.Blue:
-                agent = blue
-            else:
-                agent = red
+        agents = {Player.Blue: blue, Player.Red: red}
 
-            while True:
-                try:
-                    move = agent(self.board, self.player)
-                    result = self.turn(self.player, move)
-                except InvalidMove:
-                    # TODO: probably don't wanna print here.
-                    # print("Invalid Move")
-                    continue
-                break
+        while True:
+            actions = self.actions()
+            move = agents[self.player](self.board, self.player, actions)
+            assert move in actions
+            result = self.turn(move)
 
             if result is not None:
                 return result
