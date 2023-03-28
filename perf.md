@@ -27,3 +27,4 @@ I could try and rewrite check to use matrix templates and stuff but I also sorta
 ## Use numba on check
 * literally just decorate check with @njit()
 * down to 9.8 seconds, what is that like 87% faster????
+* zero changes to the "manually check every possible victory condition" algorithm.
