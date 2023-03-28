@@ -1,10 +1,12 @@
+import numpy as np
+
 import random
 from copy import deepcopy
 
-from .game import State, Board, Player
+from .game import State, Player
 
 
-def rand_agent(board: Board, player: Player, actions: list[int]) -> int:
+def rand_agent(board, player: Player, actions: list[int]) -> int:
     return random.choice(actions)
 
 
@@ -14,7 +16,7 @@ def rand_agent(board: Board, player: Player, actions: list[int]) -> int:
 # moves it could pick. Whichever simulation did the best is the move it picks.
 # This is done completely "on line" right now, so it's doing the simulations on it's
 # turn.
-def mcts_agent(board: Board, player: Player, actions: list[int]) -> int:
+def mcts_agent(board, player: Player, actions: list[int]) -> int:
     scores = {}
     for next_move in actions:
         # Rollout random games from this move.
@@ -24,8 +26,8 @@ def mcts_agent(board: Board, player: Player, actions: list[int]) -> int:
 
         for i in range(0, 100):
             state = State(
-                board=deepcopy(board),
-                player=deepcopy(player),
+                board=np.array(board, copy=True),
+                player=player,
             )
             state.turn(next_move)
             result, winner = state.play(rand_agent, rand_agent)

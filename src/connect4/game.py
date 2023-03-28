@@ -1,15 +1,12 @@
 from typing import Callable, Optional
 from enum import Enum
 
-Player = Enum("Player", ["Red", "Blue"])
+import numpy as np
+
+Player = Enum("Player", ["Blue", "Red"])
 Slot = Optional[Player]
 
-# TODO: probably make this a numpy array
-Board = tuple[
-    list[Slot], list[Slot], list[Slot], list[Slot], list[Slot], list[Slot], list[Slot]
-]
-
-Agent = Callable[[Board, Player, list[int]], int]
+# Agent = Callable[[Board, Player, list[int]], int]
 
 
 class InvalidMove(Exception):
@@ -21,17 +18,17 @@ RED = "\033[91m"
 END = "\033[0m"
 
 
-def display(board: Board):
+def display(board):
     print("0 1 2 3 4 5 6")
     for row in reversed(range(0, 6)):
         r = []
         for col in range(0, 7):
             s: Slot = board[col][row]
-            if s is None:
+            if s == 0:
                 r.append(".")
-            elif s == Player.Blue:
+            elif s == 1:
                 r.append(f"{BLUE}B{END}")
-            elif s == Player.Red:
+            elif s == 2:
                 r.append(f"{RED}R{END}")
             else:
                 assert False
@@ -43,14 +40,17 @@ class State:
         if board is not None:
             self.board = board
         else:
-            self.board: Board = (
-                [None, None, None, None, None, None],
-                [None, None, None, None, None, None],
-                [None, None, None, None, None, None],
-                [None, None, None, None, None, None],
-                [None, None, None, None, None, None],
-                [None, None, None, None, None, None],
-                [None, None, None, None, None, None],
+            self.board = np.array(
+                [
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0, 0],
+                ],
+                dtype="i4",
             )
         if player is not None:
             self.player = player
@@ -66,7 +66,7 @@ class State:
         for row in range(0, 6):
             for col in range(0, 4):
                 if (
-                    self.board[col][row] is not None
+                    self.board[col][row] != 0
                     and self.board[col][row]
                     == self.board[col + 1][row]
                     == self.board[col + 2][row]
@@ -77,7 +77,7 @@ class State:
         for col in range(0, 7):
             for row in range(0, 3):
                 if (
-                    self.board[col][row] is not None
+                    self.board[col][row] != 0
                     and self.board[col][row]
                     == self.board[col][row + 1]
                     == self.board[col][row + 2]
@@ -88,7 +88,7 @@ class State:
         for col in range(0, 4):
             for row in range(0, 3):
                 if (
-                    self.board[col][row] is not None
+                    self.board[col][row] != 0
                     and self.board[col][row]
                     == self.board[col + 1][row + 1]
                     == self.board[col + 2][row + 2]
@@ -100,7 +100,7 @@ class State:
         for col in range(0, 4):
             for row in range(3, 6):
                 if (
-                    self.board[col][row] is not None
+                    self.board[col][row] != 0
                     and self.board[col][row]
                     == self.board[col + 1][row - 1]
                     == self.board[col + 2][row - 2]
@@ -110,7 +110,7 @@ class State:
 
         # Check draw
         for col in range(0, 7):
-            if self.board[col][5] is None:
+            if self.board[col][5] == 0:
                 # There are still moves left
                 return None
 
@@ -119,7 +119,7 @@ class State:
     def actions(self):
         actions = []
         for col in range(0, 7):
-            if self.board[col][5] is None:
+            if self.board[col][5] == 0:
                 actions.append(col)
         return actions
 
@@ -127,8 +127,8 @@ class State:
         stack = self.board[column]
 
         for i, slot in enumerate(stack):
-            if slot is None:
-                stack[i] = self.player
+            if slot == 0:
+                stack[i] = self.player.value
                 break
 
         if self.player == Player.Blue:
@@ -138,7 +138,7 @@ class State:
 
         return self._check()
 
-    def play(self, blue: Agent, red: Agent):
+    def play(self, blue, red):
         agents = {Player.Blue: blue, Player.Red: red}
 
         while True:

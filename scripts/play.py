@@ -1,13 +1,13 @@
 # Play connect4 against yourself or an agent
 import sys
 
-from connect4 import State, Board, Player, display, BLUE, RED, END
+from connect4 import State, Player, display, BLUE, RED, END
 from connect4.agent import rand_agent, mcts_agent
 
 names = {Player.Blue: f"{BLUE}Blue{END}", Player.Red: f"{RED}Red{END}"}
 
 
-def cli_agent(board: Board, player: Player, actions: list[int]) -> int:
+def cli_agent(board, player: Player, actions: list[int]) -> int:
     while True:
         display(board)
         move = int(input(f"{names[player]}'s move: "))
