@@ -32,3 +32,11 @@ I could try and rewrite check to use matrix templates and stuff but I also sorta
 ## Do more numpy stuff
 * rewrite fast check to do more array slicing and built-in functions
 * UP to 15 seconds, I think I did a few things dumb tho.
+
+## Even more numpy
+* Ok, now like all the code is numpy code.
+* 5.6s
+* It is a little bit faster (with numba) than the old code with numba. So sort of a waste of time but still something.
+* Without numba it is slower than the old python list code.
+* So I needed to use numpy to use numba and those together did speed it up, but just numpy on it's own was slower in
+  this case than just using python for this.

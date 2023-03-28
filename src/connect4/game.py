@@ -5,129 +5,57 @@ import numpy as np
 from numba import njit
 
 Player = Enum("Player", ["Blue", "Red"])
-Slot = Optional[Player]
-
 # Agent = Callable[[Board, Player, list[int]], int]
-ones = np.array([1, 1, 1, 1])
-twos = np.array([2, 2, 2, 2])
 
 
-@njit()
+@njit(inline="always")
+def _check_run(arr):
+    """
+    Check for a run of 4
+    """
+    p = 0
+    n = 0
+    for i in range(len(arr)):
+        if arr[i] == p:
+            n += 1
+        else:
+            p = arr[i]
+            n = 1
+
+        if n == 4 and p != 0:
+            return p
+
+
+@njit(cache=True)
 def _fast_check(board):
     # Check rows
     for row in range(0, 6):
-        for col in range(0, 4):
-            a = board[col : col + 4, row]
-            if np.array_equal(a, ones):
-                return 1
-            if np.array_equal(a, twos):
-                return 2
+        check = _check_run(board[:, row])
+        if check is not None:
+            return check
 
-            # if (
-            #     board[col][row] != 0
-            #     and board[col][row]
-            #     == board[col + 1][row]
-            #     == board[col + 2][row]
-            #     == board[col + 3][row]
-            # ):
-            #     return board[col][row]
     # Check cols
     for col in range(0, 7):
-        for row in range(0, 3):
-            a = board[col][row : row + 4]
-            if np.array_equal(a, ones):
-                return 1
-            if np.array_equal(a, twos):
-                return 2
-
-            # if (
-            #     board[col][row] != 0
-            #     and board[col][row]
-            #     == board[col][row + 1]
-            #     == board[col][row + 2]
-            #     == board[col][row + 3]
-            # ):
-            #     return board[col][row]
+        check = _check_run(board[col])
+        if check is not None:
+            return check
 
     # Check diagonals
-    fb = np.fliplr(board)
     for o in range(-3, 3):
         # Get diagonal vector
-        d = np.diag(board, k=o)
-        # Diagonal can be from 4 to 6 elements long so get each 4 element view
-        for i in range(4, len(d) + 1):
-            a = d[i - 4 : i]
-            if np.array_equal(a, ones):
-                return 1
-            if np.array_equal(a, twos):
-                return 2
+        check = _check_run(np.diag(board, k=o))
+        if check is not None:
+            return check
 
-        # Get diagonal in other direction
-        d = np.diag(fb, k=-o)
-        for i in range(4, len(d) + 1):
-            a = d[i - 4 : i]
-            if np.array_equal(a, ones):
-                return 1
-            if np.array_equal(a, twos):
-                return 2
-
-    # # Diagonals
-    # a = board.diagonal(offset=2)
-    # a = board.diagonal(offset=1)[0:4]
-    # a = board.diagonal(offset=1)[1:5]
-    # a = board.diagonal(offset=0)[0:4]
-    # a = board.diagonal(offset=0)[1:5]
-    # a = board.diagonal(offset=0)[2:6]
-    # a = board.diagonal(offset=-1)
-    # a = board.diagonal(offset=-1)
-    # a = board.diagonal(offset=-1)
-    # a = board.diagonal(offset=-2)
-    # a = board.diagonal(offset=-2)
-    # a = board.diagonal(offset=-3)
-
-    # fb = np.fliplr(board)
-    # a = fb.diagonal(offset=-3)
-    # a = fb.diagonal(offset=-2)
-    # a = fb.diagonal(offset=-2)
-    # a = fb.diagonal(offset=-1)
-    # a = fb.diagonal(offset=-1)
-    # a = fb.diagonal(offset=-1)
-    # a = fb.diagonal(offset=0)
-    # a = fb.diagonal(offset=0)
-    # a = fb.diagonal(offset=0)
-    # a = fb.diagonal(offset=1)
-    # a = fb.diagonal(offset=1)
-    # a = fb.diagonal(offset=2)
-
-    # # Check diag up
-    # for col in range(0, 4):
-    #     for row in range(0, 3):
-    #         if (
-    #             board[col][row] != 0
-    #             and board[col][row]
-    #             == board[col + 1][row + 1]
-    #             == board[col + 2][row + 2]
-    #             == board[col + 3][row + 3]
-    #         ):
-    #             return board[col][row]
-
-    # # Check diag down
-    # for col in range(0, 4):
-    #     for row in range(3, 6):
-    #         if (
-    #             board[col][row] != 0
-    #             and board[col][row]
-    #             == board[col + 1][row - 1]
-    #             == board[col + 2][row - 2]
-    #             == board[col + 3][row - 3]
-    #         ):
-    #             return board[col][row]
+    fb = np.fliplr(board)
+    for o in range(-3, 3):
+        check = _check_run(np.diag(fb, k=-o))
+        if check is not None:
+            return check
 
     # Check draw
-    for col in range(0, 7):
-        if board[col][5] == 0:
-            # There are still moves left
-            return 0
+    if np.all(board[:, 5] == 0):
+        return 0
 
     return 3  # draw
 
@@ -173,11 +101,7 @@ class State:
         return results[result]
 
     def actions(self):
-        actions = []
-        for col in range(0, 7):
-            if self.board[col][5] == 0:
-                actions.append(col)
-        return actions
+        return list(np.where(self.board[:, 5] == 0)[0])
 
     def turn(self, column: int):
         stack = self.board[column]
