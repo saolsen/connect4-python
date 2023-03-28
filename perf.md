@@ -31,3 +31,4 @@ I could try and rewrite check to use matrix templates and stuff but I also sorta
 
 ## Do more numpy stuff
 * rewrite fast check to do more array slicing and built-in functions
+* UP to 15 seconds, I think I did a few things dumb tho.
