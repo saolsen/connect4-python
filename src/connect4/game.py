@@ -1,7 +1,7 @@
 from enum import Enum
 
 import numpy as np
-from numba import njit
+from numba import njit  # type: ignore
 
 Player = Enum("Player", ["Blue", "Red"])
 
