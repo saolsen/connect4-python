@@ -1,5 +1,8 @@
 [project]
 name = "connect4"
+authors = [
+    {name="Steve Olsen", email="steve@steve.computer"},
+]
 description = "connect4 ai"
 requires-python = "~=3.10"
 dependencies = ["numpy", "numba"]
