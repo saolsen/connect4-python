@@ -1,6 +1,7 @@
 import numpy as np
 
 import random
+from typing import cast
 
 from .game import State, Player
 
@@ -23,7 +24,7 @@ def mcts_agent(board, player: Player, actions: list[int]) -> int:
         losses = 0
         draws = 0
 
-        for i in range(0, 100):
+        for _ in range(0, 100):
             state = State(
                 board=np.array(board, copy=True),
                 player=player,
@@ -42,5 +43,6 @@ def mcts_agent(board, player: Player, actions: list[int]) -> int:
         scores[next_move] = score
 
     # Pick the move that had the best win ratio in it's simulated games
-    best_move = max(scores, key=scores.get)
+    # TODO: what a wacky wrapper for scores.get to make typing work...
+    best_move = max(scores, key=lambda s: cast(int, scores.get(s)))
     return best_move

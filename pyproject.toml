@@ -10,4 +10,3 @@ dependencies = ["numpy", "numba"]
 
 [project.optional-dependencies]
 dev = ["pytest", "black", "mypy"]
-

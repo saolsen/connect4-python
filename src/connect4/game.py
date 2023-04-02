@@ -1,11 +1,9 @@
-from typing import Callable, Optional
 from enum import Enum
 
 import numpy as np
 from numba import njit
 
 Player = Enum("Player", ["Blue", "Red"])
-# Agent = Callable[[Board, Player, list[int]], int]
 
 
 @njit(inline="always")
@@ -42,7 +40,6 @@ def _fast_check(board):
 
     # Check diagonals
     for o in range(-3, 3):
-        # Get diagonal vector
         check = _check_run(np.diag(board, k=o))
         if check is not None:
             return check
@@ -74,15 +71,16 @@ def display(board):
     for row in reversed(range(0, 6)):
         r = []
         for col in range(0, 7):
-            s: Slot = board[col][row]
-            if s == 0:
-                r.append(".")
-            elif s == 1:
-                r.append(f"{BLUE}B{END}")
-            elif s == 2:
-                r.append(f"{RED}R{END}")
-            else:
-                assert False
+            s = board[col][row]
+            match s:
+                case 0:
+                    r.append(".")
+                case 1:
+                    r.append(f"{BLUE}B{END}")
+                case 2:
+                    r.append(f"{RED}R{END}")
+                case _:
+                    assert False
         print(" ".join(r))
 
 
